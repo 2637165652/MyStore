@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<div id="app">
+
+    </div>
+    <script type="text/javascript" src="./vue.min.js"></script>
+    <script type="text/javascript">
+
+        //1.先在父组件中绑定自定义的属性 2.在子组件中使用props接收父组件传递的数据 3.在子组件中任意使用
+        Vue.component('Child',{
+            template:`
+                <div>
+                    <p>我是一个孩子组件</p> 
+                    <input type="text" v-model="childData" />   
+                </div>
+            `,
+            props:['childData']
+        });
+
+       Vue.component('Parent',{
+            data(){
+                return {
+                    msg:'我是父组件数据'
+                }
+            },
+            template:`
+                <div>
+                    <p>我是一个父组件</p>    
+                    <Child :childData="msg"/>
+                </div>
+        `
+       });
+
+        //入口组件
+        var App={
+            data(){
+                return{
+
+                }
+            },
+            
+            template:`
+                <Parent />
+                
+            `
+        };
+
+        new Vue({
+            el:"#app",
+            data(){
+                return{
+
+                }
+            },
+            components:{
+                App
+            },
+            template:`
+                <App/>
+            `
+
+        });
+    </script>
+</body>
+</html>

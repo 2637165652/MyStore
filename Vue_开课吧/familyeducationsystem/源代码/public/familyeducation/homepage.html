@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>网上自助家教系统</title>
+    <script type="text/javascript" src="../src/vue.js"></script>
+    <script type="text/javascript" src="../src/jquery.js"></script>
+    <link type="text/css" href="../css/homepage.css" rel="stylesheet">
+</head>
+<body> 
+    <div id="home">
+        <ul class="header"> 
+            <li v-show="isShow"><a @click="quitHandler" href="http://127.0.0.1:8080/familyeducation/login.html">退出</a></li>
+            <li v-show="!isShow"><a href="http://127.0.0.1:8080/familyeducation/login.html">登录/注册</a></li>
+            <li v-show="isShow"><a href="http://127.0.0.1:8080/familyeducation/myrecord.html">家教记录</a></li>  
+            <li v-show="isShow"><a href="http://127.0.0.1:8080/familyeducation/mymessage.html">我的资料</a></li>
+            <li><a style="color:yellow;" href="http://127.0.0.1:8080/familyeducation/homepage.html">首页</a></li>
+            
+        </ul>
+        <div class='content'>
+            <div class="search">
+                <span>【共有</span><span style="color: blue;padding: 5px;">{{ tableData.length }}</span><span>条家教信息】</span>
+                <font>家教编号：</font><input class="recordNum" v-model="searchRecordNum" type="text"/>
+                <font>学生性别:</font>
+                <select id="sex1" style="height: 25px;">
+                    <option value="">请选择</option>
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                </select>
+                <font>年级:</font>
+                <select id="grade1" style="height: 25px;">
+                    <option value="">请选择</option>
+                    <option value="一年级">一年级</option>
+                    <option value="二年级">二年级</option>
+                    <option value="三年级">三年级</option>
+                    <option value="四年级">四年级</option>
+                    <option value="五年级">五年级</option>
+                    <option value="六年级">六年级</option>
+                    <option value="初一">初一</option>
+                    <option value="初二">初二</option>
+                    <option value="初三">初三</option>
+                    <option value="高一">高一</option>
+                    <option value="高二">高二</option>
+                    <option value="高三">高三</option>
+                    <option value="幼儿园">幼儿园</option>
+                </select>
+                <font>科目:</font>
+                <select id="subject1" style="height: 25px;">
+                    <option value="">请选择</option>
+                    <option value="语文">语文</option>
+                    <option value="数学">数学</option>
+                    <option value="英语">英语</option>
+                    <option value="生物">生物</option>
+                    <option value="物理">物理</option>
+                    <option value="化学">化学</option>
+                    <option value="地理">地理</option>
+                    <option value="政治">政治</option>
+                    <option value="历史">历史</option>
+                    <option value="理综">理综</option>
+                    <option value="文综">文综</option>
+                    <option value="其他">其他</option>
+                </select>
+                <input class="button" @click="searchHandler" value="搜索" type="button">
+                <input class="button" value="显示全部" @click="showAllHandler" type="button">
+                <input class="button" value="发布家教信息" @click="releaseHandler" type="button">
+            </div>
+            <div class="tablediv">
+                <table class='information' border="1" align="center">
+                    <tr style="background-color: turquoise;">
+                        <th>家教编号</th>
+                        <th>学生性别</th>
+                        <th>年级</th>
+                        <th>科目</th>
+                        <th style="width: 500px;">学生情况及教师要求</th>
+                        <th>辅导地点</th>
+                        <th>领取家教(联系家长)</th>
+                    </tr>
+                    <tr v-for='item in tableData'>
+                        <td>{{ item.recordNum }}</td>
+                        <td>{{ item.studentsex }}</td>
+                        <td>{{ item.grade }}</td>
+                        <td>{{ item.subject }}</td>
+                        <td class="requirement">{{item.requirement}}</td>
+                        <td>{{ item.address }}</td>
+                        <td><button @click="receiveHandler(item)">领取家教</button></td>
+                    </tr>
+                </table>
+            </div> 
+            
+        </div>
+        <div class="footer">
+            <font>网上自助家教系统 Copyright&copy;</font><br>
+            <font>华南师范大学计算机学院20162180057</font>
+        </div>
+        <!-- 发布家教 -->
+        <div class="release" v-show="releaseShow">
+            <h2>发布家教信息</h2>
+            <font>学生性别：</font>
+            <select id="sex2" style="height: 25px;">
+                <option value="">请选择</option>
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
+            <font>年级：</font>
+            <select id="grade2" style="height: 25px;">
+                <option value="">请选择</option>
+                <option value="一年级">一年级</option>
+                <option value="二年级">二年级</option>
+                <option value="三年级">三年级</option>
+                <option value="四年级">四年级</option>
+                <option value="五年级">五年级</option>
+                <option value="六年级">六年级</option>
+                <option value="初一">初一</option>
+                <option value="初二">初二</option>
+                <option value="初三">初三</option>
+                <option value="高一">高一</option>
+                <option value="高二">高二</option>
+                <option value="高三">高三</option>
+                <option value="幼儿园">幼儿园</option>
+            </select>
+            <font>辅导科目：</font>
+            <select id="subject2" style="height: 25px;">
+                <option value="">请选择</option>
+                <option value="语文">语文</option>
+                <option value="数学">数学</option>
+                <option value="英语">英语</option>
+                <option value="生物">生物</option>
+                <option value="物理">物理</option>
+                <option value="化学">化学</option>
+                <option value="地理">地理</option>
+                <option value="政治">政治</option>
+                <option value="历史">历史</option>
+                <option value="理综">理综</option>
+                <option value="文综">文综</option>
+                <option value="其他">其他</option>
+            </select>
+            <br><br>
+            <font>学生情况及教师要求：</font><br><br>
+            <textarea v-model="requirement" placeholder="此处填写学生情况及教师要求，格式可参考下方" rows="10" cols="70" style="border:1px blue solid;"></textarea><br>
+            <div align="center" class="reference">
+                【参考格式】学生是一名初二的女生，性格文静，成绩中等，想找一位教师辅导数学。要求教师认真负责，有辅导经验，有学习方法。
+                辅导时间：每周2次，每次2小时，周三晚6:00-8:00和周五晚7:00-9:00。辅导价格：每小时60元，报销车费(公交地铁)。具体协商。
+            </div>
+            <font>辅导地点：</font><input v-model="address" type="text" style="width:200px;"><br>
+            <font>联 系 人：</font><input v-model="linkname" type="text" placeholder="例如：何小姐/张先生" style="width:200px;"><br>
+            <font>联系方式：</font><input v-model="linkphone" type="text" placeholder="手机号/电话"style="width:200px;"><br>
+            <button @click="releaseConfirm">确认发布</button>   <button @click="releaseShow=false">取消</button>
+        </div>
+        <!-- 发布成功 -->
+        <div class="releaseSuccess" v-show="releaseSuccessShow">
+            <h3>系统提示</h3>
+            <font>家教信息已成功发布！</font><br>
+            <font>您可以在【家教记录】中查看或修改该份家教信息。</font><br>
+            <font>注：若有教师领取家教，教师会主动联系您，请留意手机短信或来电。</font><br>
+            <button style="margin: 20px;" @click="returnHandler">返回系统</button>
+        </div>
+
+        <!-- 领取家教 -->
+        <div class="receive" v-show="receiveShow">
+            <h3>领取家教</h3>
+            <font>家教编号：{{ contactRecord.recordNum }}</font><br>
+            <font>请输入您的姓名和联系方式:</font><br>
+            <font>姓  名：</font><input v-model="teachername" type="text"><br>
+            <font>手机号：</font><input v-model="teacherphone" type="text"><br>
+            <font>点击确认领取后，您将正式领取该份家教。</font><br>
+            <font>领取后请尽快联系家长。</font><br>
+            <button @click="receiveConfirm">确认领取</button>   <button @click="receiveShow=false">取消</button>
+        </div>
+        <!-- 领取成功 -->
+        <div class="receive" v-show="receiveSuccessShow">
+            <h3>系统提示</h3>
+            <font>家教编号：{{ contactRecord.recordNum }}</font><br>
+            <font>您已成功领取该份家教，请尽快联系家长沟通。</font><br>
+            <font>（建议联系前先短信告知家长自己的身份）</font><br>
+            <font>家长：{{ contactRecord.linkname }}</font><br>
+            <font>联系方式：{{ contactRecord.linkphone }}</font><br>
+            <font>您可在【家教记录】中查看该份家教信息。</font><br>
+            <button @click="returnHandler">返回系统</button>
+        </div>
+        
+    </div>
+
+    <script type="text/javascript">
+      
+        var Home = new Vue({
+            el:'#home',
+            data(){
+                return{
+                    tableData:[],   //页面展示的家教信息
+                    isShow:false,
+                    //发布家教
+                    releaseShow:false,
+                    releaseSuccessShow:false,
+                    studentsex:'',
+                    grade:'',
+                    subject:'',
+                    requirement:'',
+                    address:'',
+                    linkname:'',
+                    linkphone:'',
+                    //领取家教
+                    receiveShow:false,
+                    receiveSuccessShow:false,
+                    contactRecord:{},   //要领取的家教信息
+                    teachername:'',     //教师领取家教时输入姓名
+                    teacherphone:'',      //教师领取家教时输入手机号
+                   
+                    searchRecordNum:'',        //按编号搜索
+                    searchSex:'',
+                    searchGrade:'',
+                    searchSubject:''
+                }
+            },
+            //创建组件之后,使用该组件，就会调用created方法
+            created:function(){
+                console.log('Home created');
+                if(localStorage.getItem('user')){
+                    this.isShow=true;
+                }
+
+                //在created这个方法中可以操作后端的数据 数据驱动视图 应用：发起ajax请求
+                $.ajax({
+                    url:'http://127.0.0.1:8080/querySubmit',
+                    method: 'GET',
+                    dataType: "json",
+                    success: function(data){
+                        console.log('查询成功');
+                        Home.tableData=data;    //不能用this
+                                           
+                    }
+                });
+            },
+            //过滤器，为页面的数据格式做调整
+            filters:{
+                
+                // 后端获取的date日期类型数据会自动转化为'2020-03-19T16:00:00.000Z'格式，需转化
+                dateFormat:function(date){
+                    var date=new Date(date);
+                    return date.toLocaleDateString();
+                }
+            },
+            methods:{
+                //按条件筛选家教
+                searchHandler(){
+                    this.searchSex=document.getElementById('sex1').value;
+                    this.searchGrade=document.getElementById('grade1').value;
+                    this.searchSubject=document.getElementById('subject1').value;
+
+                    $.ajax({
+                        url:'http://127.0.0.1:8080/searchSubmit?recordNum='+this.searchRecordNum+'&studentsex='+this.searchSex+
+                            '&grade='+this.searchGrade+'&subject='+this.searchSubject,
+                        method:'GET',
+                        dataType:'json',
+                        success:function(data){
+                            console.log(data);
+                            Home.tableData=data;    //显示筛选结果
+                        }
+                    });
+                },
+                //
+                showAllHandler(){
+                    window.location.href="http://127.0.0.1:8080/familyeducation/homepage.html";
+                },
+
+                //发布家教
+                releaseHandler(){
+                    //发布前需验证是否登录状态
+                    // console.log(JSON.parse(localStorage.getItem('user')));
+                    if(localStorage.getItem('user')){
+                        this.releaseShow=true;
+                    }else{
+                        //提示未登录，需要先登录
+                        var r=confirm("您处于未登录状态，需要先登录。前去登录/注册？");
+                        if(r==true){
+                            window.location.href = 'http://127.0.0.1:8080/familyeducation/login.html';
+                        }
+                    }
+                },
+                //确认发布家教信息
+                releaseConfirm(){
+                    this.releaseShow=false;
+                    this.studentsex=document.getElementById('sex2').value;
+                    this.grade=document.getElementById('grade2').value;
+                    this.subject=document.getElementById('subject2').value;
+                    
+                    var publisherId=JSON.parse(localStorage.getItem('user')).userId;
+
+                    $.ajax({
+                        url:'http://127.0.0.1:8080/releaseSubmit?studentsex='+this.studentsex+'&grade='+this.grade+'&subject='
+                        +this.subject+'&requirement='+this.requirement+'&address='+this.address+'&linkname='+this.linkname
+                        +'&linkphone='+this.linkphone+'&publisherId='+publisherId,
+                        method:'GET',
+                        dataType:'json',
+                        success:function(data){
+                            console.log("发布成功");
+                            Home.releaseSuccessShow=true;
+                        }
+                    });
+                },
+                //发布或领取成功，返回系统
+                returnHandler(){
+                    window.location.href = 'http://127.0.0.1:8080/familyeducation/homepage.html';
+                },
+
+                //领取家教
+                receiveHandler(item){
+                  
+                    //发布前需验证是否登录状态
+                    if(localStorage.getItem('user')){
+                        this.contactRecord=item;    //储存领取的家教信息
+                        this.receiveShow=true;  //显示领取提示
+                    }else{
+                        //提示未登录，需要先登录
+                        var r=confirm("您处于未登录状态，需要先登录。前去登录/注册？");
+                        if(r==true){
+                            window.location.href = 'http://127.0.0.1:8080/familyeducation/login.html';
+                        }
+                    }
+                },
+                //确认领取家教 提交记录，操作数据库
+                receiveConfirm(){
+                    this.receiveShow=false;
+                    this.teacherId=JSON.parse(localStorage.getItem('user')).userId;
+                    $.ajax({
+                        url:'http://127.0.0.1:8080/receiveSubmit?recordNum='+this.contactRecord.recordNum+'&studentsex='+this.contactRecord.studentsex
+                        +'&grade='+this.contactRecord.grade+'&subject='+this.contactRecord.subject+'&requirement='+this.contactRecord.requirement
+                        +'&address='+this.contactRecord.address+'&linkname='+this.contactRecord.linkname+'&linkphone='+this.contactRecord.linkphone
+                        +'&publisherId='+this.contactRecord.publisherId+'&releaseDate='+this.contactRecord.releaseDate+'&teachername='+this.teachername
+                        +'&teacherphone='+this.teacherphone+'&teacherId='+this.teacherId,
+                        method: 'GET',
+                        dataType: "json",
+                        success: function(data){
+                            console.log(data.status);
+                            console.log('提交记录成功');
+                            // Home.receiveShow=false;  
+                            Home.receiveSuccessShow=true;  //显示成功领取提示
+                        }
+                    });
+                    
+                },
+                
+                //退出登录
+                quitHandler(){
+                    window.localStorage.removeItem('user'); //退出前清空本地用户数据
+                },
+            }
+        });
+    
+    </script>
+</body>
+</html>

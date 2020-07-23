@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网上自助家教系统</title>
+    <script type="text/javascript" src="../src/vue.js"></script>
+    <script type="text/javascript" src="../src/jquery.js"></script>
+    <link type="text/css" href="../css/useradminist.css" rel="stylesheet">
+</head>
+<body>
+    <div id="useradminist">
+        <ul class="header"> 
+            <li><a @click="quitHandler" href="http://127.0.0.1:8080/familyeducation/login.html">退出</a></li>
+            <li><a href="http://127.0.0.1:8080/familyeducation/contacted.html">家教记录</a></li>  
+            <li><a href="http://127.0.0.1:8080/familyeducation/uncontacted.html">发布中家教</a></li>
+            <li><a style="color:yellow;" href="http://127.0.0.1:8080/familyeducation/useradminist.html">用户管理</a></li> 
+        </ul>
+        <div class="content">
+            <div class="tablediv">
+                <div class="search">
+                    <span>【用户总数：</span><span style="color: blue;padding: 5px;">{{ usertotal }}</span><span style="margin-right: 100px;">】</span>
+                    用户ID：<input v-model="searchUserId" type="text" style="width:100px;height:20px;">
+                    用户电话：<input v-model="searchPhonenumber" type="text" style="width:100px;height:20px;">
+                    <button @click="searchHandler">搜索</button>
+                    <button @click="showAllHandler">显示全部</button>
+                </div>
+                <table border="1" align="center">
+                    <tr style="background-color: turquoise;">
+                        <th>用户ID</th>
+                        <th>用户名</th>
+                        <th>性别</th>
+                        <th>电话</th>
+                        <th style="width:200px;">地址</th>
+                        <th>身份</th>
+                        <th>就读学校</th>
+                        <th>注销用户</th>
+                    </tr>
+                    
+                    <tr v-for='item in userData'>
+                        <td>{{ item.userId }}</td>
+                        <td>{{ item.username }}</td>
+                        <td>{{ item.sex }}</td>
+                        <td>{{ item.phonenumber }}</td>
+                        <td>{{item.address}}</td>
+                        <td>{{ item.identity }}</td>
+                        <td>{{ item.schoolname }}</td>
+                        <td><button @click="deleteUser(item)">注销</button></td>
+                    </tr>
+                </table>
+            </div> 
+            
+        </div>
+
+    </div>
+
+    <Script type="text/javascript">
+
+        var UserAdminist=new Vue({
+            el:'#useradminist',
+            data(){
+                return{
+                    userData:[],
+                    usertotal:'',
+                    searchUserId:'',
+                    searchPhonenumber:''
+                }
+            },
+            created(){
+                $.ajax({
+                    url:'http://127.0.0.1:8080/userAdminist',
+                    method:'GET',
+                    dataType:'json',
+                    success:function(data){
+                        console.log(data);
+                        UserAdminist.userData=data;
+                        UserAdminist.usertotal=data.length;
+                    }
+                });
+            },
+            methods:{
+                //退出登录
+                quitHandler(){
+                    window.localStorage.removeItem('user'); //退出前清空本地用户数据
+                },
+                deleteUser(item){
+                    var r=confirm('您确定要注销该用户吗？');
+                    if(r){
+                        $.ajax({
+                            url:'http://127.0.0.1:8080/userDelete?userId='+item.userId,
+                            method:'GET',
+                            dataType:'json',
+                            success:function(data){
+                                console.log('注销成功');
+                                alert('注销成功！');
+                                window.location.href = 'http://127.0.0.1:8080/familyeducation/useradminist.html';
+                            }
+                        });
+                    } 
+                },
+                //搜索用户
+                searchHandler(){
+                    $.ajax({
+                        url:'http://127.0.0.1:8080/searchUser?userId='+this.searchUserId+'&phonenumber='+this.searchPhonenumber,
+                        method:'GET',
+                        dataType:'json',
+                        success:function(data){
+                            console.log('搜索成功');
+                            UserAdminist.userData=data;
+                        }
+                    });
+                },
+                //显示全部
+                showAllHandler(){
+                    window.location.href='http://127.0.0.1:8080/familyeducation/useradminist.html';
+                }
+            }
+        });
+
+    </Script>
+
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>网上自助家教系统</title>
+</head>
+<script type="text/javascript" src="../src/vue.js"></script>
+<script type="text/javascript" src="../src/jquery.js"></script>
+<link type="text/css" href="../css/mymessage.css" rel="stylesheet">
+
+<body>
+    <div id="user">
+        <ul class="header"> 
+            <li style="margin-right:57px;"><a @click="quitHandler" href="http://127.0.0.1:8080/familyeducation/login.html">退出</a></li>
+            <li><a href="http://127.0.0.1:8080/familyeducation/myrecord.html">家教记录</a></li>  
+            <li><a style="color:yellow;" href="http://127.0.0.1:8080/familyeducation/mymessage.html">我的资料</a></li>
+            <li><a href="http://127.0.0.1:8080/familyeducation/homepage.html">首页</a></li>
+        </ul>
+        <div class="message">
+            <h3>我的资料</h3>
+            <table class="" align="center">
+                <tr>
+                    <td><font>用户名：</font></td>
+                    <td><input type="text" v-model="myMessage.username"></td>
+                </tr>
+                <tr>
+                    <td><font>性别：</font></td>
+                    <td>
+                        <select id="sex">
+                            <option value="">请选择</option>
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><font>手机号：</font></td>
+                    <td><input type="text" v-model="myMessage.phonenumber"></td>
+                </tr>
+                <tr>
+                    <td><font>所在地址：</font></td>
+                    <td><input type="text" v-model="myMessage.address"></td>
+                </tr>
+                <tr>
+                    <td><font>用户身份：</font></td>
+                    <td>
+                        <select id="identity">
+                            <option value="">请选择</option>
+                            <option value="家长">家长</option>
+                            <option value="家教老师">家教老师</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><font>就读学校：</font></td>
+                    <td><input type="text" v-model="myMessage.schoolname" placeholder="注：家教老师填写项" autocomplete="off"></td>
+                </tr>
+                <tr style="text-align: center;">
+                    <td colspan="2"><button  @click="saveModify">保存修改</button></td>
+                </tr>
+            </table>
+            <hr>
+            <div class="modifypwd">
+                <table align="center">
+                    <tr>
+                        <td>请输入旧密码：</td><td><input id="pwd1" type="text" v-model="oldpassword" @click="changeType"></td>
+                    </tr>
+                    <tr>
+                        <td>请输入新密码：</td><td><input id="pwd2" type="text" v-model="newpassword" @click="changeType"></td>
+                    </tr>
+                    <tr>
+                        <td>请确认新密码：</td><td><input id="pwd3" type="text" v-model="newPassword" @click="changeType"></td>
+                    </tr>
+                    <tr style="text-align:center;">
+                        <td colspan="2"><button  @click="modifypwd">修改密码</button></td>
+                    </tr>      
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        
+    
+        var User = new Vue({
+            el:"#user",
+            data(){
+                return{
+                    myMessage:{},
+                    userId:'',
+                    oldpassword:'',
+                    newpassword:'',
+                    newPassword:''
+
+                }
+            },
+            created:function(){
+                console.log("User created");
+                this.userId =JSON.parse(localStorage.getItem('user')).userId;
+                this.password =JSON.parse(localStorage.getItem('user')).password;
+                $.ajax({
+                    url:'http://127.0.0.1:8080/usermessage?userId='+this.userId,
+                    method:'GET',
+                    dataType:'json',
+                    success:function(data){
+                        // console.log(data.identity);
+                        User.myMessage=data;
+                        //显示性别
+                        var sexsel=document.getElementById('sex');
+                        for(var i=0;i<3;i++)
+                        {
+                            if(sexsel.options[i].value==data.sex){
+                                sexsel.options[i].selected='selected';break;
+                            }
+                        }
+                        //显示身份
+                        var identsel=document.getElementById('identity');
+                        for(var i=0;i<3;i++)
+                        {
+                            if(identsel.options[i].value==data.identity){
+                                identsel.options[i].selected='selected';break;
+                            }
+                        }
+                    }
+                });
+            },
+            methods:{
+                //退出
+                quitHandler(){
+                    window.localStorage.removeItem('user'); //退出前清空本地用户数据
+                },
+                //保存修改的资料
+                saveModify(){
+                    var sexsel=document.getElementById('sex');
+                    var sex=sexsel.options[sexsel.selectedIndex].value;
+                    var identsel=document.getElementById('identity');
+                    var identity=identsel.options[identsel.selectedIndex].value;
+                   
+                    $.ajax({
+                        url:'http://127.0.0.1:8080/modifyMyMessage?userId='+this.userId+'&username='+this.myMessage.username+
+                            '&sex='+sex+'&phonenumber='+this.myMessage.phonenumber+'&address='+this.myMessage.address+
+                            "&identity="+identity+"&schoolname="+this.myMessage.schoolname,
+                        method:'GET',
+                        dataType:'json',
+                        success:function(data){
+                            alert("资料修改保存成功！");
+                            //更新本地用户数据    不能用this
+                            localStorage.setItem('user',JSON.stringify({userId:User.userId,username:User.myMessage.username,password:User.password}))
+                        }
+                    });
+                },
+                //密码自动填充的解决办法
+                changeType(){
+                    document.getElementById("pwd1").type="password";
+                    document.getElementById("pwd2").type="password";
+                    document.getElementById("pwd3").type="password";
+                },
+                //修改密码
+                modifypwd(){
+                    if(this.newpassword==this.newPassword){
+                        $.ajax({
+                            url:'http://127.0.0.1:8080/modifyPassword?userId='+this.userId+'&oldpassword='+this.oldpassword
+                                +'&newpassword='+this.newpassword+'&newPassword='+this.newPassword,
+                            method:'GET',
+                            dataType:'json',
+                            success:function(data){
+                                if(data.status==1) {
+                                    alert("修改密码失败：输入的旧密码不正确！")
+                                }else if(data.status==2){
+                                    alert("修改密码成功！");
+                                    window.location.href="http://127.0.0.1:8080/familyeducation/mymessage.html";
+                                }
+                            }
+                        });
+                    }else{
+                        alert("两次输入的新密码不一致！");
+                    }
+                    
+                }
+
+            },
+            template:``
+        });
+    
+    
+    </script>
+
+
+</body>
+</html>

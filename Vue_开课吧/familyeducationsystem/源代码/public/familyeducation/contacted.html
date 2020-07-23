@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网上自助家教系统</title>
+    <script type="text/javascript" src="../src/vue.js"></script>
+    <script type="text/javascript" src="../src/jquery.js"></script>
+    <link type="text/css" href="../css/contacted.css" rel="stylesheet">
+</head>
+<body>
+    <div id="contacted">
+        <ul class="header"> 
+            <li><a @click="quitHandler" href="http://127.0.0.1:8080/familyeducation/login.html">退出</a></li>
+            <li><a style="color:yellow;" href="http://127.0.0.1:8080/familyeducation/contacted.html">家教记录</a></li>  
+            <li><a href="http://127.0.0.1:8080/familyeducation/uncontacted.html">发布中家教</a></li>
+            <li><a href="http://127.0.0.1:8080/familyeducation/useradminist.html">用户管理</a></li> 
+        </ul>
+        <div class="content">
+            <div class="search">
+                <span>【家教记录总数：</span><span style="color: blue;padding: 5px;">{{ recordtotal }}</span><span style="margin-right: 100px;">】</span>
+                家教编号：<input v-model="searchRecordNum" type="text" style="width:100px;height:20px;">
+                家长电话：<input v-model="searchLinkphone" type="text" style="width:100px;height:20px;">
+                教师电话：<input v-model="searchTeacherphone" type="text" style="width:100px;height:20px;">
+                <button @click="searchHandler">搜索</button>
+                <button @click="showAllHandler">显示全部</button>
+            </div>
+            <table border="1" align="center">
+                <tr style="background-color: turquoise;">
+                    <th>家教编号</th>
+                    <th>学生性别</th>
+                    <th>年级</th>
+                    <th>科目</th>
+                    <th style="width: 400px;">学生情况及教师要求</th>
+                    <th>辅导地点</th>
+                    <th>发布日期</th>
+                    <th>家长</th>
+                    <th>家长电话</th>
+                    <th>教师</th>
+                    <th>教师电话</th>
+                    <th>领取日期</th>
+                </tr>
+                <tr v-for="item in recordData">
+                    <td>{{ item.recordNum }}</td>
+                    <td>{{ item.studentsex }}</td>
+                    <td>{{ item.grade }}</td>
+                    <td>{{ item.subject }}</td>
+                    <td class="requirement">{{ item.requirement }}</td>
+                    <td>{{ item.address }}</td>
+                    <td>{{ item.releaseDate|dateFormat }}</td>
+                    <td>{{ item.linkname }}</td>
+                    <td>{{ item.linkphone }}</td>
+                    <td>{{ item.teachername }}</td>
+                    <td>{{ item.teacherphone }}</td>
+                    <td>{{ item.receiveDate|dateFormat }}</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+    <Script type="text/javascript">
+
+        var Contacted=new Vue({
+            el:'#contacted',
+            data(){
+                return{
+                    recordData:[],
+                    recordtotal:'',
+                    searchRecordNum:'',
+                    searchLinkphone:'',
+                    searchTeacherphone:''
+                }
+            },
+            created(){
+                $.ajax({
+                    url:'http://127.0.0.1:8080/contactedAllQuery',
+                    method:'GET',
+                    dataType:'json',
+                    success:function(data){
+                        console.log(data);
+                        Contacted.recordData=data;
+                        Contacted.recordtotal=data.length;
+                    }
+                });
+            },
+            filters:{
+                    // 后端获取的date日期类型数据会自动转化为'2020-03-19T16:00:00.000Z'格式，需转化
+                    dateFormat:function(date){
+                    var date=new Date(date);
+                    return date.toLocaleDateString();
+                }
+            },
+            methods:{
+                //退出登录
+                quitHandler(){
+                    window.localStorage.removeItem('user'); //退出前清空本地用户数据
+                },
+                //查找家教记录
+                searchHandler(){
+                    $.ajax({
+                            url:'http://127.0.0.1:8080/adminSearchRecorded?recordNum='+this.searchRecordNum
+                            +'&linkphone='+this.searchLinkphone+'&teacherphone='+this.searchTeacherphone,
+                            method:'GET',
+                            dataType:'json',
+                            success:function(data){
+                                
+                                Contacted.recordData=data;
+                            }
+                    });
+                },
+                //显示全部
+                showAllHandler(){
+                    window.location.href='http://127.0.0.1:8080/familyeducation/contacted.html';
+                }
+            }
+        });
+
+    </Script>
+
+</body>
+</html>

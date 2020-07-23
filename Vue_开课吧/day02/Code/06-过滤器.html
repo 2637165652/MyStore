@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app"></div>
+    <script type="text/javascript" src="./vue.min.js"></script>
+    <script type="text/javascript">
+
+        //全局过滤器
+        Vue.filter('myReverse',function(value,arg){
+            return arg +' '+value.split('').reverse().join('');
+        });
+
+        var App={
+            data(){
+                return {
+                    price:0,
+                    msg:'hello filter'
+                } 
+            },
+            template:`
+                <div>
+                    <input type='number' v-model='price'/>
+                    <h2>{{ price | myCurrency}}</h2>
+                    <input type='text' v-model='msg'/>
+                    <h2>{{ msg | myReverse('爱你哟')}}</h2>
+                </div>
+            `,
+            //过滤器：对数据进行”添油加醋“
+            //局部锅过滤器
+            filters:{
+                myCurrency:function(value){
+                    return "¥"+value
+                }
+            }
+        }
+
+
+        new Vue({
+            el:'#app',
+            components:{
+                App
+            },
+            template:`
+                <App/>
+            `
+
+        });
+    
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <h3>{{ msg }}</h3>
+        <h3>{{ 1+2 }}</h3>
+        <h3>{{ isTrue }}</h3>
+        <h3>{{ str.split('').reverse().join('')}}</h3>
+        <h3>{{ 1>2? '是':'否' }}</h3>
+        <h1>{{ {name:'luffy'} }}</h1>
+        <!-- <MyComponent/> 这种命名方式在DOM中直接引用无效，只能my-component -->
+    </div>
+    
+    
+    <!-- 引包 -->
+    <script type="text/javascript" src="./node_modules/vue/dist/vue.js"></script>
+    
+    <script type="text/javascript">
+        
+        var data={
+                msg:'Vue大爷',
+                isTrue:1==1,
+                str:'hello vue'
+        }
+
+    //组件名大小写
+    //1.当使用 kebab-case (短横线分隔命名) 定义一个组件时，你也必须在引用这个自定义元素时使用 kebab-case，例如 <my-component-name>
+    //2.当使用 PascalCase (首字母大写命名) 定义一个组件时，你在引用这个自定义元素时两种命名法都可以使用。也就是说 <my-component-name> 
+    //和 <MyComponentName> 都是可接受的。注意，尽管如此，直接在 DOM (即非字符串的模板) 中使用时只有 kebab-case 是有效的。
+
+        Vue.component('MyComponent',{
+            data(){
+                return {
+                    msg:'hh'
+                }
+            },
+            template:`
+                <div>
+                   {{msg}}   
+                </div>
+            `
+        })
+    
+        //创建实例化对象
+        var vm=new Vue({
+            el:'#app',	//目的地
+            data:data,
+            //如果template中定义了内容，则优先加载template，没有则加载#app的模板
+            template:`<div id="app">
+                        <h3>{{ msg }}</h3>
+                        <h3>{{ 1+2 }}</h3>
+                        <h3>{{ isTrue }}</h3>
+                        <h3>{{ str.split('').reverse().join('')}}</h3>
+                        <h3>{{ 1>2? '是':'否' }}</h3>
+                        <h1>{{ {name:'luffy'} }}</h1>
+                        <MyComponent/> 
+                    </div>`
+        });
+        console.log(vm.$data===data);
+        console.log(vm.$el===document.getElementById('app'));
+    </script>
+</body>
+</html>

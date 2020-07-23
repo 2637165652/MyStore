@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网上自助家教系统</title>
+    <script type="text/javascript" src="../src/vue.js"></script>
+    <script type="text/javascript" src="../src/jquery.js"></script>
+    <link type="text/css" href="../css/uncontacted.css" rel="stylesheet">
+</head>
+<body>
+    <div id="uncontacted">
+        <ul class="header"> 
+            <li><a @click="quitHandler" href="http://127.0.0.1:8080/familyeducation/login.html">退出</a></li>
+            <li><a href="http://127.0.0.1:8080/familyeducation/contacted.html">家教记录</a></li>  
+            <li><a style="color:yellow;" href="http://127.0.0.1:8080/familyeducation/uncontacted.html">发布中家教</a></li>
+            <li><a href="http://127.0.0.1:8080/familyeducation/useradminist.html">用户管理</a></li> 
+        </ul>
+        <div class="content">
+            <div class="search">
+                <span>【发布中家教总数：</span><span style="color: blue;padding: 5px;">{{ recordtotal }}</span><span style="margin-right: 100px;">】</span>
+                家教编号：<input v-model="searchRecordNum" type="text" style="width:100px;height:20px;">
+                <button @click="searchHandler">搜索</button>
+                <button @click="showAllHandler">显示全部</button>
+            </div>
+            <table border="1" align="center">
+                <tr style="background-color: turquoise;">
+                    <th>家教编号</th>
+                    <th>学生性别</th>
+                    <th>年级</th>
+                    <th>科目</th>
+                    <th style="width: 400px;">学生情况及教师要求</th>
+                    <th>辅导地点</th>
+                    <th>家长</th>
+                    <th>家长电话</th>
+                    <th>发布日期</th>
+                    <th>撤销家教</th>
+                </tr>
+                <tr v-for="item in recordData">
+                    <td>{{ item.recordNum }}</td>
+                    <td>{{ item.studentsex }}</td>
+                    <td>{{ item.grade }}</td>
+                    <td>{{ item.subject }}</td>
+                    <td class="requirement">{{ item.requirement }}</td>
+                    <td>{{ item.address }}</td>
+                    <td>{{ item.linkname }}</td>
+                    <td>{{ item.linkphone }}</td>
+                    <td>{{ item.releaseDate|dateFormat }}</td>
+                    <td><button @click="removeReHandler(item)">撤销</button></td>
+                </tr>   
+            </table>
+        </div>
+
+    </div>
+
+    <Script type="text/javascript">
+
+        var Uncontacted=new Vue({
+            el:'#uncontacted',
+            data(){
+                return{
+                    recordData:[],
+                    recordtotal:'',
+                    searchRecordNum:''
+                }
+            },
+            created(){
+                $.ajax({
+                    url:'http://127.0.0.1:8080/querySubmit',
+                    method:'GET',
+                    dataType:'json',
+                    success:function(data){
+                        console.log(data);
+                        Uncontacted.recordData=data;
+                        Uncontacted.recordtotal=data.length;
+                    }
+                });
+            },
+            filters:{
+                    // 后端获取的date日期类型数据会自动转化为'2020-03-19T16:00:00.000Z'格式，需转化
+                    dateFormat:function(date){
+                    var date=new Date(date);
+                    return date.toLocaleDateString();
+                }
+            },
+            methods:{
+                //退出登录
+                quitHandler(){
+                    window.localStorage.removeItem('user'); //退出前清空本地用户数据
+                },
+                //查询用户发布的家教
+                removeReHandler(item){
+                    // console.log(item.recordNum);
+                    var r=confirm("您确认要撤销该份家教信息吗？");
+                    if(r){
+                        $.ajax({
+                            url:'http://127.0.0.1:8080/removeRecord?recordNum='+item.recordNum,
+                            method:'GET',
+                            dataType:'json',
+                            success:function(data){
+                                alert("撤销家教成功！");
+                                window.location.href="http://127.0.0.1:8080/familyeducation/uncontacted.html";
+                            }
+                        });
+                    }      
+                },
+                //搜索家教
+                searchHandler(){
+                    $.ajax({
+                            url:'http://127.0.0.1:8080/adminSearchRecording?recordNum='+this.searchRecordNum,
+                            method:'GET',
+                            dataType:'json',
+                            success:function(data){
+                                Uncontacted.recordData=data;
+                            }
+                    });
+                },
+                //显示全部
+                showAllHandler(){
+                    window.location.href='http://127.0.0.1:8080/familyeducation/uncontacted.html';
+                }
+                
+            }
+        });
+
+    </Script>
+
+</body>
+</html>

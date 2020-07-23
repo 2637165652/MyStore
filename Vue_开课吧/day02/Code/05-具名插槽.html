@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app"></div>
+    <script type="text/javascript" src="./vue.min.js"></script>
+    <script type="text/javascript">
+
+        Vue.component('Myli',{
+            template:`
+                <li>    
+                    预留的第一个坑
+                    <slot name='three'></slot>
+                    预留的第二个坑
+                    <slot name='two'></slot>
+                </li>
+            `
+        });
+
+
+        var App={
+            template:`
+                <div>
+                    <ul>
+                        <Myli>
+                            <h2 slot='two'>我是H2</h2>
+                            <h3 slot='three'>我是H3</h3>
+                        </Myli>
+                    </ul>
+                </div>
+            `
+        }
+
+
+        new Vue({
+            el:'#app',
+            components:{
+                App
+            },
+            template:`
+                <App/>
+            `
+
+        });
+    
+    </script>
+</body>
+</html>

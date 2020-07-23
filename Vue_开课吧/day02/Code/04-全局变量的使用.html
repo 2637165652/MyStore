@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <style type="text/css">
+    
+        .default{
+            display: inline-block;
+            line-height: 1;
+            white-space: nowrap;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #dcdfe6;
+            border-color: #dcdfe6;
+            color: #606266;
+            -webkit-appearance: none;
+            text-align: center;
+            box-sizing: border-box;
+            outline: none;
+            margin: 0;
+            transition: .1s;
+            font-weight: 500;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+        .primary{
+            color: #fff;
+            background-color: #409eff;
+            border-color: #409eff;
+        }   
+        .success{
+            color: #fff;
+            background-color: #67c23a;
+            border-color: #67c23a;
+        }
+        
+    </style>
+
+</head>
+<body>
+
+    <div id="app">
+
+    </div>
+    <script type="text/javascript" src="./vue.min.js"></script>
+    <script type="text/javascript">
+
+        //全局组组件的创建
+        //第一个参数是组件名，第二个参数是options
+        Vue.component('Vbtn',{
+            
+            template:`
+                <button class="default" :class='type'>
+                    <slot>      <!-- 插槽 作为承接分发内容的出口 -->
+                        按钮
+                    </slot>
+                </button>
+            `,
+            props:['type']
+        });
+
+
+
+        //声子 挂子 用子
+        var Vheader={
+            template:`
+                <div class="header">我是头部组件</div>
+            `
+        };
+        var Vasider={
+            template:`
+                <div class="asider">我是侧边栏组件</div>
+            `
+        };
+        var Vcontent={
+            template:`
+                <div class="content">
+                    我是内容组件<br>
+                    <Vbtn type='primary'>主要按钮</Vbtn>
+                    <Vbtn type='success'>成功按钮</Vbtn>
+                </div>
+            `
+        }
+
+        //入口组件
+        var App={
+            data(){
+                return{
+
+                }
+            },
+            components:{
+                Vheader,
+                Vasider,
+                Vcontent
+            },
+            template:`
+                <div class="d1">
+                    <Vheader/>
+                    
+                    <div class="container">
+                        <Vasider/>
+                        <Vcontent/>
+                    </div>
+                </div>
+                
+            `
+        };
+
+        new Vue({
+            el:"#app",
+            data(){
+                return{
+
+                }
+            },
+            components:{
+                App
+            },
+            template:`
+                <App/>
+            `
+
+        });
+    </script>
+</body>
+</html>

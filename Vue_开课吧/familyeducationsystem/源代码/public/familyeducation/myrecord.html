@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网上自助家教系统</title>
+    <script type="text/javascript" src="../src/vue.js"></script>
+    <script type="text/javascript" src="../src/jquery.js"></script>
+    <link type="text/css" href="../css/myrecord.css" rel="stylesheet">
+</head>
+<body>
+    <div id="myrecord">
+        <ul class="header"> 
+            <li style="margin-right:57px;"><a @click="quitHandler" href="http://127.0.0.1:8080/familyeducation/login.html">退出</a></li>
+            <li><a style="color:yellow;" href="http://127.0.0.1:8080/familyeducation/myrecord.html">家教记录</a></li>  
+            <li><a href="http://127.0.0.1:8080/familyeducation/mymessage.html">我的资料</a></li>
+            <li><a href="http://127.0.0.1:8080/familyeducation/homepage.html">首页</a></li>  
+        </ul>
+        <div class="content">
+            <button id="btn1"  @click="uncontactedRecord" :class="{active:isCurrent==true}">发布中的家教</button>
+            <button id="btn2"  @click="contactedRecord" :class="{active:!isCurrent==true}">历史家教记录</button>
+
+            <div class="tablediv">
+                <table v-show="uncontactedIsShow" border="1" align="center">
+                    <tr style="background-color: turquoise;">
+                        <th>家教编号</th>
+                        <th>学生性别</th>
+                        <th>年级</th>
+                        <th>科目</th>
+                        <th style="width: 400px;">学生情况及教师要求</th>
+                        <th>辅导地点</th>
+                        <th>家长</th>
+                        <th>家长电话</th>
+                        <th>发布日期</th>
+                        <th>修改家教</th>
+                        <th>撤销家教</th>
+                    </tr>
+                    <tr v-for="item in uncontactedRe">
+                        <td>{{ item.recordNum }}</td>
+                        <td>{{ item.studentsex }}</td>
+                        <td>{{ item.grade }}</td>
+                        <td>{{ item.subject }}</td>
+                        <td class="requirement">{{ item.requirement }}</td>
+                        <td>{{ item.address }}</td>
+                        <td>{{ item.linkname }}</td>
+                        <td>{{ item.linkphone }}</td>
+                        <td>{{ item.releaseDate|dateFormat }}</td>
+                        <td><button @click="modifyHandler(item)">修改</button></td>
+                        <td><button @click="removeReHandler(item)">撤销</button></td>
+                    </tr>        
+                </table>
+                <!-- 修改家教 -->
+                <div class="modify" v-show="modifyShow">
+                    <h2>修改家教信息</h2>
+                    <font>学生性别：</font>
+                    <select id="sex1" style="height: 25px;">
+                        <option value="">请选择</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                    <font>年级：</font>
+                    <select id="grade1" style="height: 25px;">
+                        <option value="">请选择</option>
+                        <option value="一年级">一年级</option>
+                        <option value="二年级">二年级</option>
+                        <option value="三年级">三年级</option>
+                        <option value="四年级">四年级</option>
+                        <option value="五年级">五年级</option>
+                        <option value="六年级">六年级</option>
+                        <option value="初一">初一</option>
+                        <option value="初二">初二</option>
+                        <option value="初三">初三</option>
+                        <option value="高一">高一</option>
+                        <option value="高二">高二</option>
+                        <option value="高三">高三</option>
+                        <option value="幼儿园">幼儿园</option>
+                    </select>
+                    <font>辅导科目：</font>
+                    <select id="subject1" style="height: 25px;">
+                        <option value="">请选择</option>
+                        <option value="语文">语文</option>
+                        <option value="数学">数学</option>
+                        <option value="英语">英语</option>
+                        <option value="生物">生物</option>
+                        <option value="物理">物理</option>
+                        <option value="化学">化学</option>
+                        <option value="地理">地理</option>
+                        <option value="政治">政治</option>
+                        <option value="历史">历史</option>
+                        <option value="理综">理综</option>
+                        <option value="文综">文综</option>
+                        <option value="其他">其他</option>
+                    </select>
+                    <br><br>
+                    <font>学生情况及教师要求：</font><br><br>
+                    <textarea v-model="requirement" placeholder="此处填写学生情况及教师要求" rows="10" cols="70"></textarea><br><br>
+                    <font>辅导地点：</font><input v-model="address" type="text" style="width:200px;"><br><br>
+                    <font>联 系 人：</font><input v-model="linkname" type="text" placeholder="例如：何小姐/张先生" style="width:200px;"><br><br>
+                    <font>联系方式：</font><input v-model="linkphone" type="text" placeholder="手机号/电话" style="width:200px;"><br><br>
+                    <button @click="modifyConfirm">确认修改</button>   <button @click="modifyShow=false">取消</button>
+                </div>
+                <table v-show="contactedIsShow" border="1" align="center">
+                    <tr style="background-color: turquoise;">
+                        <th>家教编号</th>
+                        <th>学生性别</th>
+                        <th>年级</th>
+                        <th>科目</th>
+                        <th style="width: 400px;">学生情况及教师要求</th>
+                        <th>辅导地点</th>
+                        <th>发布日期</th>
+                        <th>家长</th>
+                        <th>家长电话</th>
+                        <th>教师</th>
+                        <th>教师电话</th>
+                        <th>领取日期</th>
+                        <th>重新发布</th>
+                    </tr>
+                    <tr v-for="item in contactedRe">
+                        <td>{{ item.recordNum }}</td>
+                        <td>{{ item.studentsex }}</td>
+                        <td>{{ item.grade }}</td>
+                        <td>{{ item.subject }}</td>
+                        <td class="requirement">{{ item.requirement }}</td>
+                        <td>{{ item.address }}</td>
+                        <td>{{ item.releaseDate|dateFormat }}</td>
+                        <td>{{ item.linkname }}</td>
+                        <td>{{ item.linkphone }}</td>
+                        <td>{{ item.teachername }}</td>
+                        <td>{{ item.teacherphone }}</td>
+                        <td>{{ item.receiveDate|dateFormat }}</td>
+                        <td><button @click="eidtHandler(item)">编辑发布</button></td>
+                    </tr>
+                </table>
+                <!-- 重新编辑发布 -->
+                <div class="edit" v-show="editShow">
+                    <h2>发布家教信息</h2>
+                    <font>学生性别：</font>
+                    <select id="sex2" style="height: 25px;">
+                        <option value="">请选择</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                    <font>年级：</font>
+                    <select id="grade2" style="height: 25px;">
+                        <option value="">请选择</option>
+                        <option value="一年级">一年级</option>
+                        <option value="二年级">二年级</option>
+                        <option value="三年级">三年级</option>
+                        <option value="四年级">四年级</option>
+                        <option value="五年级">五年级</option>
+                        <option value="六年级">六年级</option>
+                        <option value="初一">初一</option>
+                        <option value="初二">初二</option>
+                        <option value="初三">初三</option>
+                        <option value="高一">高一</option>
+                        <option value="高二">高二</option>
+                        <option value="高三">高三</option>
+                        <option value="幼儿园">幼儿园</option>
+                    </select>
+                    <font>辅导科目：</font>
+                    <select id="subject2" style="height: 25px;">
+                        <option value="">请选择</option>
+                        <option value="语文">语文</option>
+                        <option value="数学">数学</option>
+                        <option value="英语">英语</option>
+                        <option value="生物">生物</option>
+                        <option value="物理">物理</option>
+                        <option value="化学">化学</option>
+                        <option value="地理">地理</option>
+                        <option value="政治">政治</option>
+                        <option value="历史">历史</option>
+                        <option value="理综">理综</option>
+                        <option value="文综">文综</option>
+                        <option value="其他">其他</option>
+                    </select>
+                    <br><br>
+                    <font>学生情况及教师要求：</font><br><br>
+                    <textarea v-model="requirement" placeholder="注：格式可参考下方" rows="10" cols="70"></textarea><br><br>
+                    <font>辅导地点：</font><input v-model="address" type="text"><br><br>
+                    <font>联系人：</font><input v-model="linkname" type="text" placeholder="例如：何小姐/张先生"><br><br>
+                    <font>联系方式：</font><input v-model="linkphone" type="text" placeholder="手机号/电话"><br><br>
+                    <button @click="releaseConfirm">确认发布</button>   <button @click="editShow=false">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        var MyRecord=new Vue({
+            el:'#myrecord',
+            data(){
+                return{
+                    isCurrent:true,
+
+                    uncontactedRe:[], //存储个人发布中家教，可能有多条
+                    contactedRe:[],    //存储个人已联系家教记录
+                    userId:'',
+                    uncontactedIsShow:true,
+                    contactedIsShow:false,
+                    modifyShow:false,
+                    //修改家教
+                    recordNum:'',
+                    studentsex:'',
+                    grade:'',
+                    subject:'',
+                    requirement:'',
+                    address:'',
+                    linkname:'',
+                    linkphone:'',
+
+                    editShow:false,      //重新编辑发布
+                    publisherId:''
+                }
+            },
+             //创建组件之后,使用该组件，就会调用created方法
+             created:function(){
+                console.log('MyRecord created');
+                this.userId=JSON.parse(localStorage.getItem('user')).userId;
+
+                ////初始化时发请求获取发布中家教记录
+                $.ajax({
+                    url:'http://127.0.0.1:8080/uncontactedQuery?userId='+this.userId,
+                    method: 'GET',
+                    dataType: "json",
+                    success: function(data){
+                        // console.log(data);
+                        MyRecord.uncontactedRe=data;                    
+                    }
+                });
+                //初始化时发请求获取已领取家教记录
+                $.ajax({
+                        url:'http://127.0.0.1:8080/contactedQuery?userId='+this.userId,
+                        method: 'GET',
+                        dataType: "json",
+                        success: function(data){
+                            // console.log(data);
+                            MyRecord.contactedRe=data;
+                                            
+                        }
+                    });
+            },
+            filters:{
+                // 后端获取的date日期类型数据会自动转化为'2020-03-19T16:00:00.000Z'格式，需转化
+                dateFormat:function(date){
+                    var date=new Date(date);
+                    return date.toLocaleDateString();
+                }
+            },
+            methods:{
+                //退出
+                quitHandler(){
+                    window.localStorage.removeItem('user'); //退出前清空本地用户数据
+                },
+                //查看正在发布的家教记录
+                uncontactedRecord(){
+                    this.isCurrent=true;
+                    this.uncontactedIsShow=true;
+                    this.contactedIsShow=false;
+                },
+                modifyHandler(item){
+                    //显示修改前的信息
+                    this.recordNum=item.recordNum;
+                    this.requirement=item.requirement;
+                    this.address=item.address;
+                    this.linkname=item.linkname;
+                    this.linkphone=item.linkphone;
+                    var sel=document.getElementById('sex1');
+                    for(var i=0;i<3;i++)
+                    {
+                        if(sel.options[i].value==item.studentsex){
+                            sel.options[i].selected='selected';break;
+                        }
+                    }
+                    var sel=document.getElementById('grade1');
+                    for(var i=0;i<14;i++)
+                    {
+                        if(sel.options[i].value==item.grade){
+                            sel.options[i].selected='selected';break;
+                        }
+                    }   
+                    var sel=document.getElementById('subject1');
+                    for(var i=0;i<13;i++)
+                    {
+                        if(sel.options[i].value==item.subject){
+                            sel.options[i].selected='selected';break;
+                        }
+                    }                       
+
+                    this.modifyShow=true;
+                },
+                //确认修改家教信息
+                modifyConfirm(){
+                    this.studentsex=document.getElementById('sex1').value;
+                    this.grade=document.getElementById('grade1').value;
+                    this.subject=document.getElementById('subject1').value;
+
+                    MyRecord.modifyShow=false;
+                    $.ajax({
+                        url:'http://127.0.0.1:8080/modifyRecord?recordNum='+this.recordNum+'&studentsex='+this.studentsex+'&grade='+this.grade+'&subject='
+                        +this.subject+'&requirement='+this.requirement+'&address='+this.address+'&linkname='+this.linkname
+                        +'&linkphone='+this.linkphone,
+                        method:'GET',
+                        dataType:'json',
+                        success:function(data){
+                            // MyRecord.modifyShow=false;
+                            console.log("修改成功");
+                            alert("家教信息已成功修改！");
+                            window.location.href="http://127.0.0.1:8080/familyeducation/myrecord.html";
+                        }
+                    });
+                },
+                //撤销正发布的家教
+                removeReHandler(item){
+                    // console.log(item.recordNum);
+                    var r=confirm("您确认要撤销该份家教信息吗？");
+                    if(r){
+                        $.ajax({
+                            url:'http://127.0.0.1:8080/removeRecord?recordNum='+item.recordNum,
+                            method:'GET',
+                            dataType:'json',
+                            success:function(data){
+                                alert("撤销家教成功！");
+                                window.location.href="http://127.0.0.1:8080/familyeducation/myrecord.html";
+                            }
+                        });
+                    }      
+                },
+
+                //查看已领取的家教记录
+                contactedRecord(){           
+                    this.isCurrent=false;        
+                    this.uncontactedIsShow=false;
+                    this.contactedIsShow=true;
+                },
+                //重新编辑发布
+                eidtHandler(item){
+                    //显示编辑前的信息
+                    this.requirement=item.requirement;
+                    this.address=item.address;
+                    this.linkname=item.linkname;
+                    this.linkphone=item.linkphone;
+                    var sel=document.getElementById('sex2');
+                    for(var i=0;i<3;i++)
+                    {
+                        if(sel.options[i].value==item.studentsex){
+                            sel.options[i].selected='selected';break;
+                        }
+                    }
+                    var sel=document.getElementById('grade2');
+                    for(var i=0;i<14;i++)
+                    {
+                        if(sel.options[i].value==item.grade){
+                            sel.options[i].selected='selected';break;
+                        }
+                    }   
+                    var sel=document.getElementById('subject2');
+                    for(var i=0;i<13;i++)
+                    {
+                        if(sel.options[i].value==item.subject){
+                            sel.options[i].selected='selected';break;
+                        }
+                    } 
+
+                    this.editShow=true;
+                },
+                //确认重新发布
+                releaseConfirm(){
+                    this.studentsex=document.getElementById('sex2').value;
+                    this.grade=document.getElementById('grade2').value;
+                    this.subject=document.getElementById('subject2').value;
+                    var publisherId=JSON.parse(localStorage.getItem('user')).userId;
+                    MyRecord.editShow=false;
+                    $.ajax({
+                        url:'http://127.0.0.1:8080/editReleaseSubmit?studentsex='+this.studentsex+'&grade='+this.grade
+                            +'&subject='+this.subject+'&requirement='+this.requirement+'&address='+this.address
+                            +'&linkname='+this.linkname+'&linkphone='+this.linkphone+'&publisherId='+publisherId,
+                        method:'GET',
+                        dataType:'json',
+                        success:function(data){
+                            console.log("发布成功");
+                            alert("家教信息已成功发布！");
+                            window.location.href="http://127.0.0.1:8080/familyeducation/myrecord.html";
+                        }
+                    });
+                }
+            }
+        });
+
+    </script>
+    
+</body>
+</html>
